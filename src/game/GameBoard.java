@@ -14,7 +14,7 @@ public class GameBoard extends JPanel implements Runnable {
     private Berry berry;
     private boolean inGame;
     private final BufferStrategy bs;
-    private final int FRAME_DELAY = 400;
+    private final int FRAME_DELAY = 50;
     private long cycleTime;
 
     public GameBoard(int width, int height, BufferStrategy bs) {
@@ -31,10 +31,10 @@ public class GameBoard extends JPanel implements Runnable {
     private void gameInit() {
         inGame = true;
 
-        berry = new Berry(10, Color.YELLOW, WIDTH, HEIGHT);
+        berry = new Berry(10, Color.RED, WIDTH, HEIGHT);
         berry.locateBerry();
 
-        snake = new Snake(50, 50, 10, berry, Color.GREEN, Color.GRAY);
+        snake = new Snake((WIDTH /20)*10, (HEIGHT /20)*10, 10, berry, Color.GREEN, Color.GRAY);
 
         Thread animation = new Thread(this, "Game");
         animation.start();
@@ -92,9 +92,9 @@ public class GameBoard extends JPanel implements Runnable {
         if(Collisions.checkCollisions(snake, WIDTH, HEIGHT)){
             inGame=false;
         }else if(Collisions.checkReward(snake, berry)){
-            System.out.println(true);
-            snake.expandBody();
+//            System.out.println(true);
             berry.locateBerry();
+            snake.expandBody();
         }else{
 //            snake.getSnakeDir();
 //            snake.calcAndMoveHead();

@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static game.Direction.*;
 
@@ -23,7 +24,7 @@ public class Snake extends Graphics {
         this.berry = berry;
         setColorBody(colorBody);
         setDir(Direction.RIGHT);
-        expandBody();
+        initExpandBody();
     }
 
     @Override
@@ -54,8 +55,14 @@ public class Snake extends Graphics {
 
 
     public void expandBody(){
-        body.add(0, new Graphics(getX(),getY(), getSizePx(), getColorBody()));
-        move();
+        body.add(0, new Graphics(getX(), getY(), getSizePx(), getColorBody()));
+        calcAndMoveHead();
+//        move();
+    }
+
+    public void initExpandBody(){
+//        body.add(0, new Graphics(getX(),getY(), getSizePx(), getColor()));
+        body.add(0, new Graphics(getX(),getY()+getSizePx(), getSizePx(), getColorBody()));
     }
 
     public List<Graphics> getBody(){
@@ -63,30 +70,40 @@ public class Snake extends Graphics {
     }
 
     public void move(){
-        moveBody();
+//        moveBody();
         calcAndMoveHead();
     }
 
     public void calcAndMoveHead(){
         double angle = getAngle(getDirToBerry(), getSnakeDir());
-        if (angle<0){setDir(LEFT);}
-        if (angle>0){setDir(RIGHT);}
-//        if (getSnakeDir() == null){setDir(RIGHT);}
+        boolean clear = false;
+        while (!clear) {
+            if (angle == 0 || angle == -1 || angle == 1) {
+                Integer[] currentDir = getSnakeDir();
+                currentDir[1] = currentDir[1] * (-1);
+                if (!checkSelfCollision(currentDir)) {
+                    moveHead(currentDir);
+                    break;
+                }
 
-//        Double[] s = getSnakeDir();
-//
-//        Double[] v1 = getSnakeLeftVector();
-//        Double[] v2 = getSnakeRightVector();
-
-        if (getDir() == LEFT){
-            moveHead(getSnakeLeftVector());
+            } else if (angle > 0) {
+                setDir(RIGHT);
+                if (!checkSelfCollision(getSnakeRightVector())) {
+                    moveHead(getSnakeRightVector());
+                    break;
+                }
+//            moveHead(getSnakeRightVector());
+            } else if (angle < 0) {
+                setDir(LEFT);
+                if (!checkSelfCollision(getSnakeLeftVector())) {
+                    moveHead(getSnakeLeftVector());
+                    break;
+                }
+//            moveHead(getSnakeLeftVector());
+            }
+            Random rand = new Random();
+            angle = Math.sin(rand.nextDouble()*Math.PI*rand.nextInt(10));
         }
-        if (getDir() == RIGHT){
-            moveHead(getSnakeRightVector());
-        }
-
-        System.out.println(angle);
-        System.out.println(getDir());
     }
 
     public Double[] getDirToBerry() {
@@ -97,8 +114,8 @@ public class Snake extends Graphics {
         int xBerry = berry.getX();
         int yBerry = berry.getY();
 
-        int dx = xBerry - x;
-        int dy = yBerry - y;
+        int dx = x - xBerry ;
+        int dy = y - yBerry ;
 
         double mag = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 
@@ -112,7 +129,7 @@ public class Snake extends Graphics {
 
     }
 
-    public double getAngle(Double[] v1, Double[] v2){
+    public double getAngle(Double[] v1, Integer[] v2){
 
         double angle = Math.atan2(v1[1] * v2[0] - v1[0] * v2[1],
                 v1[1] * v2[1] + v1[0] * v2[0]) / Math.PI;
@@ -121,42 +138,38 @@ public class Snake extends Graphics {
 
     }
 
-//        if ((dx_norm == 0)&(dy_norm == 1)){
-//            System.out.println("UP");
-//            return UP;
-//        }
-//        if ((dx_norm == 0)&(dy_norm == -1)){
-//            System.out.println("DOWN");
-//            return DOWN;
-//        }
-//        if ((dx_norm == -1)&(dy_norm == 0)){
-//            System.out.println("LEFT");
-//            return LEFT;
-//        }
-//        if ((dx_norm == 1)&(dy_norm == 0)){
-//            System.out.println("RIGHT");
-//            return RIGHT;
-//        }
-//        return LEFT;
-//    }
+    public boolean checkSelfCollision(Integer[] direction){
+//        Integer[] collisions = {0, 0, 0};
+        int dirChangeX = direction[0]*getSizePx();
+        int dirChangeY = direction[1]*getSizePx();
+        int newX = getX()+dirChangeX;
+        int newY = getY()+dirChangeY;
 
-    public Double[] getSnakeDir(){
-        Double[] v = {0d, 0d};
+        for (Graphics item : getBody()) {
+            if (newX == item.getX() && newY == item.getY()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Integer[] getSnakeDir(){
+        Integer[] v = {0, 0};
 
         int x = getX();
         int y = getY();
         System.out.println("body size");
         System.out.println(body.size());
 
-        int x_body = body.get(body.size()-1).getX();
-        int y_body = body.get(body.size()-1).getY();
+        int x_body = body.get(0).getX();
+        int y_body = body.get(0).getY();
 
         int dx = x - x_body;
         int dy = y - y_body;
 
         if ((dx==0)&&(dy==0)){
-            v[0] = 1d;
-            v[1] = 0d;
+            v[0] = 1;
+            v[1] = 0;
             return v;}
 
         double mag = Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
@@ -164,26 +177,39 @@ public class Snake extends Graphics {
         double dx_norm = dx/mag;
         double dy_norm = dy/mag;
 
-        v[0] = dx_norm;
-        v[1] = dy_norm;
+        v[0] = (int) dx_norm;
+        v[1] = (int) dy_norm * (-1);
 
         return v;
     }
 
-    private void moveHead(Double[] vector){
+    private void moveHead(Integer[] vector){
 
-        Double[] left =  {-1d, 0d};
-        Double[] right =  {1d, 0d};
-        Double[] up =  {0d, 1d};
-        Double[] down =  {0d, -1d};
+        Integer[] left =  {-1, 0};
+        Integer[] right =  {1, 0};
+        Integer[] down =  {0, 1};
+        Integer[] up =  {0, -1};
 
-        if (Arrays.equals(vector, left)) {
+        int tmpX = getX(), tmpY = getY(), tmp;
+
+        for (Graphics item : body){
+            tmp = item.getX();
+            item.setX(tmpX);
+            tmpX = tmp;
+
+            tmp = item.getY();
+            item.setY(tmpY);
+            tmpY = tmp;
+
+        }
+
+        if ((vector[0] == left[0])&&(vector[1] == left[1])) {
             setX(getX() - getSizePx());
-        } else if ( Arrays.equals(vector,right)) {
+        } else if ((vector[0] == right[0])&&(vector[1] == right[1])) {
             setX(getX() + getSizePx());
-        } else if (Arrays.equals(vector, up)) {
+        } else if ((vector[0] == up[0])&&(vector[1] == up[1])) {
             setY(getY() - getSizePx());
-        } else if (Arrays.equals(vector, down)){
+        } else if ((vector[0] == down[0])&&(vector[1] == down[1])){
             setY(getY() + getSizePx());
         }
     }
@@ -202,17 +228,32 @@ public class Snake extends Graphics {
         }
     }
 
-    public Double[] getSnakeRightVector(){
-        Double[] rightVector = {0d, 0d};
-        if (getSnakeDir()[1] != 0){rightVector[0] = getSnakeDir()[1]*(-1);}
-        if (getSnakeDir()[0] != 0){rightVector[1] = getSnakeDir()[0];}
+//    left_direction_vector = np.array([snake_dir[1]*(-1), snake_dir[0]])
+//    right_direction_vector = np.array([snake_dir[1], snake_dir[0]*(-1)])
+
+    public Integer[] getSnakeRightVector(){
+        Integer[] rightVector = {0, 0};
+//        if (getSnakeDir()[0] != 0){rightVector[1] = getSnakeDir()[0];}
+//        if (getSnakeDir()[1] != 0){rightVector[0] = getSnakeDir()[1]*(-1);}
+//        rightVector[0] = getSnakeDir()[1];
+//        rightVector[1] = getSnakeDir()[0]*(-1);
+
+        Integer[] snakeDir = getSnakeDir();
+
+        rightVector[0] = snakeDir[1];
+        rightVector[1] = snakeDir[0]*(-1);
         return rightVector;
     }
-    public Double[] getSnakeLeftVector(){
-        Double[] leftVector = {0d, 0d};
-        if (getSnakeDir()[1] != 0){leftVector[0] = getSnakeDir()[1];}
-        if (getSnakeDir()[0] != 0){leftVector[1] = getSnakeDir()[0]*(-1);}
+    public Integer[] getSnakeLeftVector(){
+        Integer[] leftVector = {0, 0};
+//        if (getSnakeDir()[0] != 0){leftVector[1] = getSnakeDir()[1]*(-1);}
+//        if (getSnakeDir()[1] != 0){leftVector[0] = getSnakeDir()[0];}
+//        leftVector[0] = getSnakeDir()[1]*(-1);
+//        leftVector[1] = getSnakeDir()[0];
+        Integer[] snakeDir = getSnakeDir();
+        leftVector[0] = snakeDir[1]*(-1);
+        leftVector[1] = snakeDir[0];
+
         return leftVector;
     }
-
 }
