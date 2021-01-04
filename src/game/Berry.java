@@ -14,8 +14,8 @@ public class Berry extends Graphics{
 
     public Berry(int sizePx, Color color, int maxX, int maxY) {
         super(0, 0, sizePx, color);
-        this.maxX = maxX - 20;
-        this.maxY = maxY - 20;
+        this.maxX = maxX - 50;
+        this.maxY = maxY - 50;
         rand = new Random();
     }
 
@@ -29,11 +29,11 @@ public class Berry extends Graphics{
     public void locateBerry(){
         int tmp;
         tmp = rand.nextInt((maxX-getSizePx())/getSizePx());
-        x = tmp*getSizePx();
+        x = tmp*getSizePx()+GameBoard.getOffset();
         setX(x);
 
         tmp = rand.nextInt((maxY-50-getSizePx())/getSizePx());
-        y = tmp*getSizePx();
+        y = tmp*getSizePx()+GameBoard.getOffset();
         setY(y);
     }
 

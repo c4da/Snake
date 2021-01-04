@@ -7,14 +7,17 @@ public class MainBoard extends JFrame {
 
     public MainBoard(String title,int width, int height){
         setTitle(title);
-        setSize(new Dimension(width+3, height+3));
+//        setSize(new Dimension(width+50, height+50));
         setLocationRelativeTo(null);
-        setLocation(0, 250);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(new Dimension(width, height));
         setVisible(true);
         createBufferStrategy(2);
-        add(new GameBoard(width, height, getBufferStrategy()));
+        GameBoard g = new GameBoard(width, height, getBufferStrategy());
+        add(g);
+//        pack();
+
     }
 
 }

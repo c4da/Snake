@@ -12,8 +12,10 @@ public class Collisions {
             }
         }
 
-        if(snake.getX() < 0){return true;}
-        if(snake.getY() < 0){return true;}
+        if(snake.getX() < GameBoard.getOffset()){return true;}
+        if (snake.getY() < GameBoard.getOffset()) {
+            return true;
+        }
         if(snake.getX() >= maxX){return true;}
         return snake.getY() >= maxY;
     }

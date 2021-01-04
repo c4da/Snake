@@ -2,11 +2,8 @@ package game;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-
-import static game.Direction.*;
 
 public class Snake extends Graphics {
     private final List<Graphics> body;
@@ -76,25 +73,33 @@ public class Snake extends Graphics {
 
     public void calcAndMoveHead(){
         double angle = getAngle(getDirToBerry(), getSnakeDir());
-        boolean clear = false;
-        while (!clear) {
-            if (angle == 0 || angle == -1 || angle == 1) {
-                Integer[] currentDir = getSnakeDir();
+        while (true) {
+            Integer[] currentDir = getSnakeDir();
+            if (angle == -1) {
+                if (!checkSelfCollision(currentDir)) {
+//                    currentDir[1] = currentDir[1] ;
+                    moveHead(currentDir);
+                    break;
+                }
+            } else if (angle == 0.0) {
                 currentDir[1] = currentDir[1] * (-1);
                 if (!checkSelfCollision(currentDir)) {
                     moveHead(currentDir);
                     break;
                 }
-
-            } else if (angle > 0) {
-                setDir(RIGHT);
+            } else if (angle == 1) {
+                currentDir[1] = currentDir[1] * (-1);
+                if (!checkSelfCollision(currentDir)) {
+                    moveHead(currentDir);
+                    break;
+                }
+           } else if (angle > 0) {
                 if (!checkSelfCollision(getSnakeRightVector())) {
                     moveHead(getSnakeRightVector());
                     break;
                 }
 //            moveHead(getSnakeRightVector());
-            } else if (angle < 0) {
-                setDir(LEFT);
+           } else if (angle < 0) {
                 if (!checkSelfCollision(getSnakeLeftVector())) {
                     moveHead(getSnakeLeftVector());
                     break;
@@ -103,6 +108,17 @@ public class Snake extends Graphics {
             }
             Random rand = new Random();
             angle = Math.sin(rand.nextDouble()*Math.PI*rand.nextInt(10));
+            if (angle > 0) {
+                if (!checkSelfCollision(getSnakeRightVector())) {
+                    moveHead(getSnakeRightVector());
+                    break;
+                }
+            } else if (angle < 0) {
+                if (!checkSelfCollision(getSnakeLeftVector())) {
+                    moveHead(getSnakeLeftVector());
+                    break;
+                }
+            }
         }
     }
 
