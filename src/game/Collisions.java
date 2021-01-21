@@ -16,8 +16,8 @@ public class Collisions {
         if (snake.getY() < GameBoard.getOffset()) {
             return true;
         }
-        if(snake.getX() >= maxX){return true;}
-        return snake.getY() >= maxY;
+        if(snake.getX() > maxX){return true;}
+        return snake.getY() > maxY;
     }
 
     public static boolean checkReward(Snake snake, Berry berry){

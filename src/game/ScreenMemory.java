@@ -1,10 +1,12 @@
 package game;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ScreenMemory {
-    public ArrayList<Integer> oneScreen;
-    public ArrayList<ArrayList> oneGame;
+public class ScreenMemory implements Serializable {
+
+    public Short[] oneScreen;
+//    public ArrayList<ArrayList> oneGame;
 
     public ScreenMemory() {
 
