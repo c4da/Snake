@@ -3,11 +3,13 @@ package game;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+import java.io.IOException;
 
 public class GameBoard extends JPanel implements Runnable {
 
     private final int WIDTH;
     private final int HEIGHT;
+    private final int gameNumber;
     private Snake snake;
     private Berry berry;
     private boolean inGame;
@@ -15,13 +17,16 @@ public class GameBoard extends JPanel implements Runnable {
     private final int FRAME_DELAY = 50;
     private long cycleTime;
     private static int offset = 50;
+    public ScreenMemory gameMemory;
 
-    public GameBoard(int width, int height, BufferStrategy bs) {
+    public GameBoard(int gameNumber, int width, int height, BufferStrategy bs) {
+        this.gameNumber = gameNumber;
 //        addKeyListener(new TAdapter());
         setFocusable(true);
         setIgnoreRepaint(true);
         WIDTH = width-2*offset;
         HEIGHT = height-2*offset;
+        gameMemory = new ScreenMemory(WIDTH, HEIGHT, 10);
         this.bs = bs;
 //        setBounds(offset, offset, WIDTH, HEIGHT);
         setSize(new Dimension(WIDTH, HEIGHT));
@@ -35,7 +40,6 @@ public class GameBoard extends JPanel implements Runnable {
 
     private void gameInit() {
         inGame = true;
-
         berry = new Berry(10, Color.RED, WIDTH, HEIGHT);
         berry.locateBerry();
 
@@ -52,13 +56,18 @@ public class GameBoard extends JPanel implements Runnable {
         cycleTime = System.currentTimeMillis();
 
         while(inGame){
+            gameMemory.saveScreen(snake.getBody(), berry);
             updateLogic();
             updateGui();
             synchFrameRate();
         }
 
+        try {
+            gameMemory.saveFile(gameNumber);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         gameOver();
-
     }
 
     /**
