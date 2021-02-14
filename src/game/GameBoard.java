@@ -14,7 +14,7 @@ public class GameBoard extends JPanel implements Runnable {
     private Berry berry;
     private boolean inGame;
     private final BufferStrategy bs;
-    private final int FRAME_DELAY = 50;
+    private final int FRAME_DELAY = 200;
     private long cycleTime;
     private static int offset = 50;
     public ScreenMemory gameMemory;
@@ -57,6 +57,7 @@ public class GameBoard extends JPanel implements Runnable {
 
         while(inGame){
             gameMemory.saveScreen(snake.getBody(), berry);
+            gameMemory.saveGameData(snake.getBody(), berry);
             updateLogic();
             updateGui();
             synchFrameRate();

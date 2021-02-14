@@ -19,23 +19,24 @@ public class ScreenMemory implements Serializable {
     public ArrayList<float[][]> game;
 
     public ScreenMemory(int width, int height, int size){
+        this.game = new ArrayList<float[][]>();
         this.width = width;
         this.height = height;
         this.size = size;
-        this.oneScreen = new float[Math.round(width/size)][Math.round(height/size)];
+        this.oneScreen = new float[Math.round(width/size)+10][Math.round(height/size)+10];
         initScreenMemory();
     }
 
     public void initScreenMemory(){
 
         for (float[] row: oneScreen)
-            Arrays.fill(row, 1.0f);
+            Arrays.fill(row, 0.0f);
     }
 
     public void saveScreen(List<Graphics> snakeBody, Graphics berry){
 
         initScreenMemory();
-
+        //offset = 100 -> proto -10
         for (Graphics pos:snakeBody){
             int posX = Math.round(pos.getX()/size);
             int posY = Math.round(pos.getY()/size);
@@ -43,7 +44,7 @@ public class ScreenMemory implements Serializable {
         }
         int berryX = Math.round(berry.getX()/size);
         int berryY = Math.round(berry.getY()/size);
-        oneScreen[berryX][berryY] = 0.5f;
+        oneScreen[berryX][berryY] = 10;
     }
 
     public void saveGameData(List<Graphics> snakeBody, Graphics berry){

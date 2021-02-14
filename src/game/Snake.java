@@ -72,26 +72,35 @@ public class Snake extends Graphics {
     }
 
     public void calcAndMoveHead(){
-        double angle = getAngle(getDirToBerry(), getSnakeDir());
+        Double[] dirToBerry = getDirToBerry();
+        Integer[] currentDir = getSnakeDir();
+
+        double angle = getAngle(dirToBerry, currentDir);
+
         while (true) {
-            Integer[] currentDir = getSnakeDir();
             if (angle == -1) {
                 if (!checkSelfCollision(currentDir)) {
 //                    currentDir[1] = currentDir[1] ;
                     moveHead(currentDir);
                     break;
+                }else{
+                    randMoveHead();
                 }
             } else if (angle == 0.0) {
                 currentDir[1] = currentDir[1] * (-1);
                 if (!checkSelfCollision(currentDir)) {
                     moveHead(currentDir);
                     break;
+                }else{
+                    randMoveHead();
                 }
             } else if (angle == 1) {
                 currentDir[1] = currentDir[1] * (-1);
                 if (!checkSelfCollision(currentDir)) {
                     moveHead(currentDir);
                     break;
+                }else{
+                    randMoveHead();
                 }
            } else if (angle > 0) {
                 if (!checkSelfCollision(getSnakeRightVector())) {
@@ -119,6 +128,17 @@ public class Snake extends Graphics {
                     break;
                 }
             }
+            randMoveHead();
+
+        }
+    }
+
+    public void randMoveHead(){
+        Random rand = new Random();
+        if (rand.nextFloat()<0.5) {
+            moveHead(getSnakeLeftVector());
+        }else{
+            moveHead(getSnakeRightVector());
         }
     }
 
@@ -130,7 +150,7 @@ public class Snake extends Graphics {
         int xBerry = berry.getX();
         int yBerry = berry.getY();
 
-        int dx = x - xBerry ;
+        int dx = x - xBerry  ;
         int dy = y - yBerry ;
 
         double mag = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
